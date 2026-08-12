@@ -14,22 +14,6 @@ import java.net.URI;
 @Slf4j
 public class GitHubRepoInfoParser {
 
-//    private Response parseResponse(String url) throws Exception {
-//
-//        String[] repoInfo = extractOwnerAndRepo(url);
-//        String ownerName = repoInfo[0];
-//        String repoName = repoInfo[1];
-//
-//        GitHub gitHub = GitHub.connectAnonymously();
-//
-//        String fullPath = ownerName + "/" + repoName;
-//        GHRepository repository = gitHub.getRepository(fullPath);
-//
-//        log.info("Description" + repository.getDescription());
-//        log.info("Stars" + repository.getStargazersCount());
-//
-//    }
-
     public static String[] extractOwnerAndRepo(String url) {
 
         if (url.endsWith("/")) {
