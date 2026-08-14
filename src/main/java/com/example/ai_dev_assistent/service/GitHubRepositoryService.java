@@ -11,6 +11,8 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.example.ai_dev_assistent.service.ExtractService.extractOwnerAndRepo;
 
 @Service
@@ -50,6 +52,23 @@ public class GitHubRepositoryService {
 
         return new Response(ownerName, repoName, request.getUrl());
 
+    }
+
+    public List<Response> getAll() {
+        log.info("Get All GitHub Repository");
+        return gitHubRepositoryRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    // mapper
+    private Response toResponse(GitHubRepository gitHubRepository) {
+        Response response = new Response();
+        response.setUrl(gitHubRepository.getUrl());
+        response.setName(gitHubRepository.getName());
+        response.setOwner(gitHubRepository.getOwner());
+        return  response;
     }
 
 
