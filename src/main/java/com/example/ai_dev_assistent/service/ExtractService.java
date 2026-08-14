@@ -2,17 +2,13 @@ package com.example.ai_dev_assistent.service;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.kohsuke.github.GitHub;
-import org.kohsuke.github.GHRepository;
-import com.example.ai_dev_assistent.dto.Response;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.net.URI;
 
 @Service
 @Slf4j
-public class GitHubRepoInfoParser {
+public class ExtractService {
 
     public static String[] extractOwnerAndRepo(String url) {
 
