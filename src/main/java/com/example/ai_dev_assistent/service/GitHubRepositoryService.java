@@ -11,6 +11,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.example.ai_dev_assistent.service.ExtractService.extractOwnerAndRepo;
@@ -21,56 +22,44 @@ import static com.example.ai_dev_assistent.service.ExtractService.extractOwnerAn
 public class GitHubRepositoryService {
 
     private final GitHubRepositoryRepository gitHubRepositoryRepository;
+    private final GitHub gitHub;
 
     @Transactional
-    private Response create(Request request) throws Exception {
-
-        log.info("Creating GitHub Repository");
-
-        GitHubRepository gitHubRepository = new GitHubRepository();
-
+    public Response create(Request request) throws IOException {
         String[] repoInfo = extractOwnerAndRepo(request.getUrl());
         String ownerName = repoInfo[0];
         String repoName = repoInfo[1];
 
-        log.info("Connect GitHub API");
-        GitHub gitHub = GitHub.connectAnonymously();
-
         String fullPath = ownerName + "/" + repoName;
-
-        log.info("Connect GitHub Repository {} to User {}", gitHubRepository.getName(), ownerName);
+        log.info("Fetching repository info for {}", fullPath);
         GHRepository repository = gitHub.getRepository(fullPath);
 
-        gitHubRepository.setName(ownerName);
+        GitHubRepository gitHubRepository = gitHubRepositoryRepository.findByOwnerAndName(ownerName, repoName)
+                .orElseGet(GitHubRepository::new);
+
+        gitHubRepository.setName(repoName);
         gitHubRepository.setOwner(ownerName);
-        gitHubRepository.setUrl(request.getUrl());
-
+        gitHubRepository.setUrl("https://github.com/" + fullPath);
         gitHubRepositoryRepository.save(gitHubRepository);
-        log.info("Created GitHub Repository");
-        log.info("Description" + repository.getDescription());
-        log.info("Stars" + repository.getStargazersCount());
 
-        return new Response(ownerName, repoName, request.getUrl());
+        log.info("Saved repository {} (Stars: {})", fullPath, repository.getStargazersCount());
 
+        return new Response(ownerName, repoName, gitHubRepository.getUrl());
     }
 
     public List<Response> getAll() {
-        log.info("Get All GitHub Repository");
+        log.info("Get All GitHub Repositories");
         return gitHubRepositoryRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    // mapper
     private Response toResponse(GitHubRepository gitHubRepository) {
         Response response = new Response();
         response.setUrl(gitHubRepository.getUrl());
         response.setName(gitHubRepository.getName());
         response.setOwner(gitHubRepository.getOwner());
-        return  response;
+        return response;
     }
-
-
-
 }
