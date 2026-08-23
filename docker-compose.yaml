@@ -1,12 +1,10 @@
-version: "3.9"
-
 services:
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: ai_review_postgres
+    container_name: ai_assistant_db
     restart: always
     environment:
-      POSTGRES_DB: aidb
+      POSTGRES_DB: ai_assistant_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgrespassword
     ports:
@@ -14,5 +12,15 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ai_assistant_ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
 volumes:
   pg_data:
+  ollama_data:
